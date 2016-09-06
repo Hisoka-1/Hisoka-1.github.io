@@ -37940,7 +37940,7 @@ function params() {
 function getText(prop) {
     var language = params()['lang'];
     if (params()['lang'] == undefined) {
-        language = params()['german'];
+        language = 'german';
     }
     return _text2.default[language][prop];
 };
@@ -37974,7 +37974,6 @@ module.exports.loadLevel = function (levelNr) {
 };
 
 module.exports.resetButtonGeklickt = function () {
-	console.log('reset');
 	return {
 		type: 'resetButtonGeklickt'
 	};
@@ -38226,7 +38225,6 @@ function gameLogic() {
 				ref: action.ref
 			});
 		case 'resetButtonGeklickt':
-			console.log('reset2');
 			return Object.assign({}, intitalState, {
 				count: state.count + 1
 			});
