@@ -1,0 +1,124 @@
+.Background {
+    background: -moz-linear-gradient(90deg, rgba(8,152,255,1) 0%, rgba(5,209,255,1) 100%); /* ff3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(5,209,255,1)), color-stop(100%, rgba(8,152,255,1))); /* safari4+,chrome */
+    background: -webkit-linear-gradient(90deg, rgba(8,152,255,1) 0%, rgba(5,209,255,1) 100%); /* safari5.1+,chrome10+ */
+    background: -o-linear-gradient(90deg, rgba(8,152,255,1) 0%, rgba(5,209,255,1) 100%); /* opera 11.10+ */
+    background: -ms-linear-gradient(90deg, rgba(8,152,255,1) 0%, rgba(5,209,255,1) 100%); /* ie10+ */
+    background: linear-gradient(0deg, rgba(8,152,255,1) 0%, rgba(5,209,255,1) 100%); /* w3c */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#05D1FF', endColorstr='#0898FF',GradientType=0 ); /* ie6-9 */
+	height:100%;
+	width:100%;
+	display:table;
+	text-align: center;
+ 	display: flex;
+  	flex-direction: column;
+  	justify-content: center;
+}
+
+body {
+    margin: 0px;
+}
+
+.Titel, .Button{
+    text-transform: uppercase;
+    font-family: arial;
+}
+
+.Titel {
+	font-size: 125px;
+	color:green;
+	text-shadow:  1px  1px 5px black,
+                  1px -1px 5px black,
+                 -1px  1px 5px black,
+                 -1px -1px 5px black;
+    padding: 5px;
+    display:inline-block;
+}
+
+.TitelZeile{
+    position: relative;
+}
+
+.KeinSpielStein {
+
+}
+
+.SpielStein , .KeinSpielStein , .StartStein, .FroschKoerper{
+    height:50px;
+    width:50px;
+}
+
+.SpielStein , .KeinSpielStein , .StartStein{
+	margin:25px;
+	display:inline-block;
+}
+
+.Spielstein[data-typ="x"], .Spielstein[data-typ="s"]{
+  background-image: url("../sprites/lilypad.png");
+  background-size: 100% 100%;
+}
+
+.FroschKoerper {
+	background-image: url("../sprites/Frosch.png");
+	background-repeat: no-repeat;
+  transform: scale(1.8, 1.8);
+  bottom:10px;
+  position:absolute;
+  opacity:0;
+}
+
+.rechts {
+    animation: rechts 2s steps(3) infinite;
+}
+
+.letter-appear {
+  opacity: 0.01;
+}
+
+.letter-appear.letter-appear-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.frosch-leave {
+  opacity: 1;
+}
+
+.frosch-leave.frosch-leave-active {
+  opacity: 0.01;
+  transition: opacity 3000ms ease-in;
+}
+
+.frosch-appear {
+   opacity: 0.01;
+}
+
+.frosch-appear.frosch-appear-active {
+   opacity: 1;
+   transition: opacity 3000ms linear;
+}
+
+.Button {
+  background: #a6ffbb;
+  background-image: -webkit-linear-gradient(top, #a6ffbb, #4da157);
+  background-image: -moz-linear-gradient(top, #a6ffbb, #4da157);
+  background-image: -ms-linear-gradient(top, #a6ffbb, #4da157);
+  background-image: -o-linear-gradient(top, #a6ffbb, #4da157);
+  background-image: linear-gradient(to bottom, #a6ffbb, #4da157);
+  -webkit-border-radius: 28;
+  -moz-border-radius: 28;
+  border-radius: 14px;
+  text-shadow: 0px 0px 0px #ffffff;
+  font-family: Arial;
+  color: #000000;
+  font-size: 37px;
+  padding: 5px 20px 5px 20px;
+  border: solid #000000 4px;
+  text-decoration: none;
+  margin:auto;
+  width:50%;
+}
+
+.Button:hover {
+  text-decoration: none;
+}
