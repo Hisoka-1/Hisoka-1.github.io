@@ -37861,6 +37861,9 @@ function handleMove(level, neuePosition) {
 }
 
 function isGewonnen(level) {
+	if (level.array == undefined) {
+		return false;
+	}
 	var _iteratorNormalCompletion = true;
 	var _didIteratorError = false;
 	var _iteratorError = undefined;
@@ -37912,6 +37915,37 @@ function isGewonnen(level) {
 }
 
 },{"../entities/Level.es6":587,"../entities/Position.es6":588}],590:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.params = params;
+exports.getText = getText;
+
+var _text = require("./text.json");
+
+var _text2 = _interopRequireDefault(_text);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function params() {
+    var queryDict = {};
+    location.search.substr(1).split("&").forEach(function (item) {
+        queryDict[item.split("=")[0]] = item.split("=")[1];
+    });
+    return queryDict;
+};
+
+function getText(prop) {
+    var language = params()['lang'];
+    if (params()['lang'] == undefined) {
+        language = params()['german'];
+    }
+    return _text2.default[language][prop];
+};
+
+},{"./text.json":595}],591:[function(require,module,exports){
 'use strict';
 
 var _Level = require('../entities/Level.es6');
@@ -37939,8 +37973,11 @@ module.exports.loadLevel = function (levelNr) {
 	};
 };
 
-module.exports.menueButtonGeklickt = function () {
-	return {};
+module.exports.resetButtonGeklickt = function () {
+	console.log('reset');
+	return {
+		type: 'resetButtonGeklickt'
+	};
 };
 
 module.exports.spielSteinGesetzt = function (ref) {
@@ -37950,7 +37987,7 @@ module.exports.spielSteinGesetzt = function (ref) {
 	};
 };
 
-},{"../entities/Level.es6":587,"../js/maps.json":592}],591:[function(require,module,exports){
+},{"../entities/Level.es6":587,"../js/maps.json":593}],592:[function(require,module,exports){
 'use strict';
 
 var _react = require('react');
@@ -37966,6 +38003,8 @@ var _redux = require('redux');
 var _redux2 = _interopRequireDefault(_redux);
 
 require('babel-polyfill');
+
+var _Util = require('./Util.es6');
 
 var _store = require('./store.es6');
 
@@ -37985,10 +38024,9 @@ var _Level2 = _interopRequireDefault(_Level);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var urlParam = location.search.slice(1);
-
-if (urlParam !== '') {
-  _store2.default.dispatch(_actions2.default.loadLevel(urlParam));
+var levelWahl = (0, _Util.params)()['level'];
+if (levelWahl != undefined) {
+  _store2.default.dispatch(_actions2.default.loadLevel((0, _Util.params)()['level']));
 }
 
 (0, _reactDom.render)(_react2.default.createElement(
@@ -38001,7 +38039,7 @@ if (urlParam !== '') {
   )
 ), document.getElementById('level'));
 
-},{"../presentational/Level.jsx":597,"./actions.es6":590,"./maps.json":592,"./store.es6":593,"babel-polyfill":1,"react":489,"react-dom":300,"react-redux":303,"redux":495}],592:[function(require,module,exports){
+},{"../presentational/Level.jsx":599,"./Util.es6":590,"./actions.es6":591,"./maps.json":593,"./store.es6":594,"babel-polyfill":1,"react":489,"react-dom":300,"react-redux":303,"redux":495}],593:[function(require,module,exports){
 module.exports=[
 	[ ["s", "x", "x", "x"]],
 
@@ -38137,7 +38175,7 @@ module.exports=[
 	  [" ", " ", "x", " ", "x", " ", " "],
 	],
 ]
-},{}],593:[function(require,module,exports){
+},{}],594:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38171,19 +38209,26 @@ function gameLogic() {
 			return Object.assign({}, state, {
 				count: state.count + 1,
 				level: newLevel,
-				gewonnen: GameEngine.isGewonnen(newLevel)
+				gewonnen: GameEngine.isGewonnen(newLevel),
+				frisch: false
 			});
 		case 'loadLevel':
 			return Object.assign({}, state, {
 				count: state.count + 1,
 				level: action.level,
 				levelNr: action.levelNr,
-				gewonnen: GameEngine.isGewonnen(action.level)
+				gewonnen: GameEngine.isGewonnen(action.level),
+				frisch: true
 			});
 		case 'spielSteinGesetzt':
 			return Object.assign({}, state, {
 				count: state.count + 1,
 				ref: action.ref
+			});
+		case 'resetButtonGeklickt':
+			console.log('reset2');
+			return Object.assign({}, intitalState, {
+				count: state.count + 1
 			});
 		default:
 			return state;
@@ -38195,7 +38240,26 @@ var Store = (0, _redux.createStore)(gameLogic, intitalState, window.devToolsExte
 
 exports.default = Store;
 
-},{"./GameEngine.es6":589,"redux":495}],594:[function(require,module,exports){
+},{"./GameEngine.es6":589,"redux":495}],595:[function(require,module,exports){
+module.exports={
+    "german":{
+        "title":"FroJu",
+        "easy":"Leicht",
+        "medium":"Mittel",
+        "hard":"Schwer",
+        "reset":"Neustarten",
+        "menu":"Menü"
+    },
+    "english":{
+        "title":"FroJu",
+        "easy":"easy",
+        "medium":"medium",
+        "hard":"hard",
+        "reset":"reset",
+        "menu":"Menu"
+    }
+}
+},{}],596:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38281,7 +38345,7 @@ var FroschMitState = (0, _reactRedux.connect)(function (state) {
 
 exports.default = FroschMitState;
 
-},{"./FroschKoerper.jsx":595,"react":489,"react-redux":303,"velocity-animate":504,"velocity-animate/velocity.ui":505,"velocity-react":506}],595:[function(require,module,exports){
+},{"./FroschKoerper.jsx":597,"react":489,"react-redux":303,"velocity-animate":504,"velocity-animate/velocity.ui":505,"velocity-react":506}],597:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38323,25 +38387,35 @@ var FroschKoerper = function (_React$Component) {
     _createClass(FroschKoerper, [{
         key: 'render',
         value: function render() {
-            return _react2.default.createElement('div', { className: 'FroschKoerper rechts', ref: 'FroschKoerper' });
+            return _react2.default.createElement('div', { className: 'FroschKoerper', ref: 'FroschKoerper' });
         }
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            console.log(this.props);
+
             Velocity(this.refs.FroschKoerper, {
                 top: this.props.steinRef.top - 17,
                 left: this.props.steinRef.left
             });
             Velocity(this.refs.FroschKoerper, { scaleX: 1.8, scaleY: 1.8 });
             Velocity(this.refs.FroschKoerper, 'transition.slideLeftBigIn');
+            Velocity(this.refs.FroschKoerper, { backgroundPositionX: [-96, 0], backgroundPositionY: [-300, -300] }, { easing: [2], duration: 2000, loop: true });
         }
+    }, {
+        key: 'componentWillUpdate',
+        value: function componentWillUpdate(nextProp, nextState) {}
     }, {
         key: 'componentDidUpdate',
         value: function componentDidUpdate(oldProp, oldState) {
-            console.log(this.props);
+            Velocity(this.refs.FroschKoerper, "stop", true);
+
+            var coord = calculate(this.props, oldProp);
+
+            Velocity(this.refs.FroschKoerper, { backgroundPositionX: coord.bx, backgroundPositionY: coord.by }, { easing: [1], duration: 500 });
+
             Velocity(this.refs.FroschKoerper, { top: this.props.rect.top - 17,
                 left: this.props.rect.left }, { duration: 500, queue: false });
+
             var horizontalMove = this.props.rect.left != this.props.rect.left;
             var verticalMove = this.props.rect.top != this.props.rect.top;
             if (!verticalMove) {
@@ -38350,6 +38424,13 @@ var FroschKoerper = function (_React$Component) {
             } else if (!horizontalMove) {
                 Velocity(this.refs.FroschKoerper, { left: this.props.rect.left - 17 }, { duration: 200, queue: false });
                 Velocity(this.refs.FroschKoerper, { left: this.props.rect.left }, { delay: 200, duration: 250, queue: false });
+            }
+
+            console.log(this.props.frisch);
+            if (this.props.frisch) {
+                Velocity(this.refs.FroschKoerper, { backgroundPositionX: [-96, 0], backgroundPositionY: [-300, -300] }, { easing: [2], duration: 2000, loop: true });
+            } else {
+                Velocity(this.refs.FroschKoerper, { backgroundPositionX: [-96, 0], backgroundPositionY: coord.lY }, { easing: [2], duration: 2000, loop: true });
             }
         }
     }, {
@@ -38367,17 +38448,28 @@ var FroschKoerper = function (_React$Component) {
 ;
 
 var FroschKoerperMitState = (0, _reactRedux.connect)(function (state) {
-    console.log(state.level);
     return {
         steinRef: state.ref.getBoundingClientRect(),
-        position: state.level.getSpielSteinPosition()
-
+        position: state.level.getSpielSteinPosition(),
+        frisch: state.frisch
     };
 }, {})(FroschKoerper);
 
+var calculate = function calculate(neu, alt) {
+    if (neu.position.zeile < alt.position.zeile) //oben
+        return { bx: [0, -96], by: [-144, -144], lY: [-340, -340] };
+    if (neu.position.zeile > alt.position.zeile) //unten
+        return { bx: [0, -96], by: [0, 0], lY: [-195, -195] };
+    if (neu.position.spalte < alt.position.spalte) //links
+        return { bx: [0, -96], by: [-48, -48], lY: [-252, -252] };
+    if (neu.position.spalte > alt.position.spalte) //rechts
+        return { bx: [0, -96], by: [-96, -96], lY: [-300, -300] };
+    return { bx: [0, -96], by: [-300, -300] };
+};
+
 exports.default = FroschKoerperMitState;
 
-},{"react":489,"react-redux":303,"velocity-animate":504,"velocity-animate/velocity.ui":505,"velocity-react":506}],596:[function(require,module,exports){
+},{"react":489,"react-redux":303,"velocity-animate":504,"velocity-animate/velocity.ui":505,"velocity-react":506}],598:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38448,7 +38540,7 @@ var GewonnenAnimationMitState = (0, _reactRedux.connect)(function (state) {
 
 exports.default = GewonnenAnimationMitState;
 
-},{"./FroschKoerper.jsx":595,"react":489,"react-redux":303,"velocity-animate":504,"velocity-animate/velocity.ui":505,"velocity-react":506}],597:[function(require,module,exports){
+},{"./FroschKoerper.jsx":597,"react":489,"react-redux":303,"velocity-animate":504,"velocity-animate/velocity.ui":505,"velocity-react":506}],599:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38490,6 +38582,8 @@ var _Splash = require('./Splash.jsx');
 
 var _Splash2 = _interopRequireDefault(_Splash);
 
+var _Util = require('../js/Util.es6');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var LevelComp = (0, _react.createClass)({
@@ -38515,7 +38609,8 @@ var LevelComp = (0, _react.createClass)({
 				_react2.default.createElement(_Splash2.default, { visible: this.props.gewonnen, text: 'Gewonnen' }),
 				spielzeilen,
 				_react2.default.createElement(_Frosch2.default, null),
-				_react2.default.createElement(_MenuButton2.default, { text: 'reset', level: this.props.levelNr })
+				_react2.default.createElement(_MenuButton2.default, { text: (0, _Util.getText)("reset"), level: this.props.levelNr }),
+				_react2.default.createElement(_MenuButton2.default, { text: (0, _Util.getText)("menu") })
 			);
 		} else {
 			return _react2.default.createElement(_Menu2.default, null);
@@ -38541,7 +38636,7 @@ var LevelMitState = (0, _reactRedux.connect)(function (state) {
 
 exports.default = LevelMitState;
 
-},{"../js/actions.es6":590,"./Frosch.jsx":594,"./GewonnenAnimation.jsx":596,"./Menu.jsx":599,"./MenuButton.jsx":600,"./SpielZeile.jsx":602,"./Splash.jsx":603,"react":489,"react-redux":303}],598:[function(require,module,exports){
+},{"../js/Util.es6":590,"../js/actions.es6":591,"./Frosch.jsx":596,"./GewonnenAnimation.jsx":598,"./Menu.jsx":600,"./MenuButton.jsx":601,"./SpielZeile.jsx":603,"./Splash.jsx":604,"react":489,"react-redux":303}],600:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38554,114 +38649,6 @@ var _react = require('react');
 var _react2 = _interopRequireDefault(_react);
 
 var _reactRedux = require('react-redux');
-
-var _actions = require('../js/actions.es6');
-
-var _actions2 = _interopRequireDefault(_actions);
-
-var _Frosch = require('./Frosch.jsx');
-
-var _Frosch2 = _interopRequireDefault(_Frosch);
-
-require('velocity-animate');
-
-require('velocity-animate/velocity.ui');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var SpielStein = (0, _react.createClass)({
-    render: function render() {
-        var _this = this;
-
-        var clickHandler = this.props.typ != " " ? function () {
-            return _this.props.onTodoClick(_this.props.position);
-        } : function () {};
-        return _react2.default.createElement(
-            'div',
-            {
-                style: { width: 50, height: 50, margin: 25, display: 'inline-block' },
-                onClick: clickHandler,
-                key: this.props.position
-            },
-            _react2.default.createElement('span', { ref: 'x', style: { width: 50,
-                    height: 50,
-                    backgroundImage: 'url("../sprites/lilypad.png")',
-                    backgroundSize: '100% 100%',
-                    display: 'inline-block'
-                } })
-        );
-    },
-    statics: {
-        getTyp: function getTyp(level, position) {
-            return level.array[position.zeile][position.spalte];
-        },
-        getBackgroundColor: function getBackgroundColor(typ) {
-            switch (typ) {
-                case "x":
-                    return 'white';
-                case " ":
-                    return '';
-                case "s":
-                    return 'black';
-                default:
-                    return '';
-            }
-        }
-    },
-    componentDidMount: function componentDidMount() {
-        if (this.props.typ == 's') {
-            this.props.onSpielSteinGesetzt(this.refs.SpielStein);
-        }
-    },
-    componentWillUpdate: function componentWillUpdate(nextProp, nextState) {
-        if (!this.props.spielStein.equals(nextProp.spielStein)) if (nextProp.spielStein.equals(this.props.position)) this.props.onSpielSteinGesetzt(this.refs.SpielStein);
-        if (this.props.typ != nextProp.typ) {
-            if (nextProp.typ == ' ') {
-                Velocity(this.refs.SpielStein, 'transition.slideDownOut', { display: 'inline-block' });
-                Velocity(this.refs.SpielStein, { display: 'inline-block' });
-            }
-        }
-    }
-
-});
-
-var SpielSteinMitState = (0, _reactRedux.connect)(function (state, ownProps) {
-    var typ = SpielStein.getTyp(state.level, ownProps.position);
-    return {
-        typ: typ,
-        style: { backgroundColor: SpielStein.getBackgroundColor(typ) },
-        spielStein: state.level.getSpielSteinPosition()
-    };
-}, function (dispatch) {
-    return {
-        onTodoClick: function onTodoClick(id) {
-            dispatch(_actions2.default.spielsteinGeklickt(id));
-        },
-        onSpielSteinGesetzt: function onSpielSteinGesetzt(ref) {
-            dispatch(_actions2.default.spielSteinGesetzt(ref));
-        }
-    };
-})(SpielStein);
-
-exports.default = SpielSteinMitState;
-
-},{"../js/actions.es6":590,"./Frosch.jsx":594,"react":489,"react-redux":303,"velocity-animate":504,"velocity-animate/velocity.ui":505}],599:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.default = undefined;
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactRedux = require('react-redux');
-
-var _text = require('./text.json');
-
-var _text2 = _interopRequireDefault(_text);
 
 var _MenuButton = require('./MenuButton.jsx');
 
@@ -38675,22 +38662,25 @@ var _Splash = require('./Splash.jsx');
 
 var _Splash2 = _interopRequireDefault(_Splash);
 
+var _Util = require('../js/Util.es6');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Menu = (0, _react.createClass)({
     render: function render() {
-        console.log(_text2.default);
-        var title = _text2.default['german']['title'];
-        var leicht = _text2.default['german']['easy'];
-        var mittel = _text2.default['german']['medium'];
-        var schwer = _text2.default['german']['hard'];
+
+        var title = (0, _Util.getText)('title');
+        var leicht = (0, _Util.getText)('easy');
+        var mittel = (0, _Util.getText)('medium');
+        var schwer = (0, _Util.getText)('hard');
+        console.log(title);
         var chars = [];
 
         return _react2.default.createElement(
             'div',
             { className: 'TitelZeile' },
             _react2.default.createElement(_Splash2.default, { text: title }),
-            _react2.default.createElement(_MenuButton2.default, { text: leicht, level: 1 }),
+            _react2.default.createElement(_MenuButton2.default, { text: leicht, level: 0 }),
             _react2.default.createElement(_MenuButton2.default, { text: mittel, level: Math.floor(_maps2.default.length / 3) * 1 }),
             _react2.default.createElement(_MenuButton2.default, { text: schwer, level: Math.floor(_maps2.default.length / 3) * 2 })
         );
@@ -38703,7 +38693,7 @@ var MenuMitState = (0, _reactRedux.connect)(function (state) {
 
 exports.default = MenuMitState;
 
-},{"../js/maps.json":592,"./MenuButton.jsx":600,"./Splash.jsx":603,"./text.json":604,"react":489,"react-redux":303}],600:[function(require,module,exports){
+},{"../js/Util.es6":590,"../js/maps.json":593,"./MenuButton.jsx":601,"./Splash.jsx":604,"react":489,"react-redux":303}],601:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38716,10 +38706,6 @@ var _react = require('react');
 var _react2 = _interopRequireDefault(_react);
 
 var _reactRedux = require('react-redux');
-
-var _text = require('./text.json');
-
-var _text2 = _interopRequireDefault(_text);
 
 var _reactAddonsCssTransitionGroup = require('react-addons-css-transition-group');
 
@@ -38768,14 +38754,18 @@ var ButtonMitState = (0, _reactRedux.connect)(function (state) {
 }, function (dispatch) {
     return {
         onTodoClick: function onTodoClick(id) {
-            dispatch(_actions2.default.loadLevel(id));
+            if (id == undefined) {
+                dispatch(_actions2.default.resetButtonGeklickt());
+            } else {
+                dispatch(_actions2.default.loadLevel(id));
+            }
         }
     };
 })(Button);
 
 exports.default = ButtonMitState;
 
-},{"../js/actions.es6":590,"./text.json":604,"react":489,"react-addons-css-transition-group":298,"react-redux":303}],601:[function(require,module,exports){
+},{"../js/actions.es6":591,"react":489,"react-addons-css-transition-group":298,"react-redux":303}],602:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38887,7 +38877,7 @@ var SpielSteinMitState = (0, _reactRedux.connect)(function (state, ownProps) {
 
 exports.default = SpielSteinMitState;
 
-},{"../js/actions.es6":590,"./Frosch.jsx":594,"react":489,"react-redux":303,"velocity-animate":504,"velocity-animate/velocity.ui":505}],602:[function(require,module,exports){
+},{"../js/actions.es6":591,"./Frosch.jsx":596,"react":489,"react-redux":303,"velocity-animate":504,"velocity-animate/velocity.ui":505}],603:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38937,7 +38927,7 @@ var SpielZeileMitState = (0, _reactRedux.connect)(function (state) {
 
 exports.default = SpielZeileMitState;
 
-},{"../entities/Position.es6":588,"./SpielStein.jsx":601,"react":489,"react-redux":303}],603:[function(require,module,exports){
+},{"../entities/Position.es6":588,"./SpielStein.jsx":602,"react":489,"react-redux":303}],604:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38999,16 +38989,4 @@ var Splash = (0, _react.createClass)({
 
 exports.default = Splash;
 
-},{"react":489,"react-addons-css-transition-group":298}],604:[function(require,module,exports){
-module.exports={
-    "german":{
-        "title":"FroJu",
-        "easy":"leicht",
-        "medium":"mittel",
-        "hard":"schwer"
-},
-    "english":{
-        "title":"FroJu"
-}
-}
-},{}]},{},[587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604]);
+},{"react":489,"react-addons-css-transition-group":298}]},{},[587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604]);
